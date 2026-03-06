@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import LogWorkout from "./components/LogWorkout/LogWorkout";
+import History from "./components/History/History";
 
 const COLORS = {
   bg: "#0a0a0a",
@@ -280,64 +281,6 @@ function Dashboard({ onStartWorkout }) {
             <div style={{ fontSize: "20px", fontWeight: "700", color: COLORS.accent }}>{pr.weight}</div>
             <div style={{ fontSize: "9px", color: COLORS.textMuted }}>LBS</div>
           </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── HISTORY ─────────────────────────────────────────────────────────────────
-function History() {
-  const [expanded, setExpanded] = useState(null);
-  return (
-    <div style={styles.page}>
-      <span style={styles.label}>Workout History</span>
-      <div style={styles.accentBar} />
-      {mockHistory.map((w) => (
-        <div key={w.id} style={{ ...styles.card, cursor: "pointer" }} onClick={() => setExpanded(expanded === w.id ? null : w.id)}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div>
-              <div style={{ fontWeight: "700", fontSize: "15px" }}>{w.name}</div>
-              <div style={{ fontSize: "11px", color: COLORS.textMuted, marginTop: "2px" }}>{w.date}</div>
-              <div style={{ display: "flex", gap: "4px", marginTop: "8px", flexWrap: "wrap" }}>
-                {w.muscles.map((m) => <span key={m} style={styles.tag()}>{m}</span>)}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "16px", fontWeight: "700", color: COLORS.accent }}>{w.exercises.length}</div>
-                <div style={{ fontSize: "8px", color: COLORS.textMuted }}>EX</div>
-              </div>
-              <div style={{ color: COLORS.textMuted, fontSize: "18px" }}>{expanded === w.id ? "↑" : "↓"}</div>
-            </div>
-          </div>
-
-          {expanded === w.id && (
-            <div style={{ marginTop: "14px", paddingTop: "14px", borderTop: `1px solid ${COLORS.border}` }}>
-              {w.exercises.map((ex) => (
-                <div key={ex.name} style={{ marginBottom: "12px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: "600", color: COLORS.accent, marginBottom: "6px" }}>{ex.name}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 1fr", gap: "4px" }}>
-                    <div style={{ fontSize: "8px", color: COLORS.textMuted }}>SET</div>
-                    <div style={{ fontSize: "8px", color: COLORS.textMuted }}>REPS</div>
-                    <div style={{ fontSize: "8px", color: COLORS.textMuted }}>LBS</div>
-                    {ex.sets.map((s, i) => (
-                      <>
-                        <div key={`set-${i}`} style={{ fontSize: "12px", color: COLORS.textDim }}>{i + 1}</div>
-                        <div style={{ fontSize: "12px" }}>{s.reps}</div>
-                        <div style={{ fontSize: "12px" }}>{s.weight || "BW"}</div>
-                      </>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <div style={{ display: "flex", gap: "12px", paddingTop: "10px", borderTop: `1px solid ${COLORS.border}` }}>
-                <span style={{ fontSize: "11px", color: COLORS.textMuted }}>😴 {w.sleep}h</span>
-                <span style={{ fontSize: "11px", color: COLORS.textMuted }}>🍽 {w.diet}</span>
-                <span style={{ fontSize: "11px", color: w.recovery === "Excellent" ? COLORS.green : w.recovery === "Good" ? COLORS.green : COLORS.orange }}>⚡ {w.recovery}</span>
-              </div>
-            </div>
-          )}
         </div>
       ))}
     </div>
