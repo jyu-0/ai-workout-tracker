@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import LogWorkout from "./components/LogWorkout/LogWorkout";
 import History from "./components/History/History";
 import Progress from "./components/Progress/Progress";
+import AIChat from "./components/AIChat/AIChat";
 
 const COLORS = {
   bg: "#0a0a0a",
@@ -284,122 +285,6 @@ function Dashboard({ onStartWorkout }) {
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-
-// ── AI CHAT ──────────────────────────────────────────────────────────────────
-function AIChat() {
-  const [messages, setMessages] = useState(initialMessages);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
-
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
-  const send = async () => {
-    if (!input.trim() || loading) return;
-    const userMsg = { role: "user", content: input.trim() };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const systemPrompt = `You are an expert AI performance coach embedded in a workout tracker app. You help gym-goers optimize their training based on lifestyle factors like sleep, diet, and recovery. You're knowledgeable, direct, and motivating — like a personal trainer who also understands sports nutrition. Keep responses concise (2-4 sentences max). Focus on practical, actionable advice. You can comment on how sleep, diet, and stress affect workout performance.`;
-
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [...messages, userMsg].map((m) => ({ role: m.role, content: m.content })),
-        }),
-      });
-
-      const data = await response.json();
-      const reply = data.content?.map((b) => b.text || "").join("") || "Sorry, I couldn't get a response.";
-      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Connection error. Please try again." }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickPrompts = ["I only slept 5 hours", "Best pre-workout meal?", "I'm hungover today", "Should I train fasted?"];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", paddingBottom: "80px" }}>
-      {/* Header */}
-      <div style={{ padding: "24px 20px 16px", borderBottom: `1px solid ${COLORS.border}` }}>
-        <span style={styles.label}>AI Coach</span>
-        <div style={styles.accentBar} />
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: COLORS.green }} />
-          <span style={{ fontSize: "12px", color: COLORS.textMuted }}>Online · Powered by Claude</span>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-        {messages.map((m, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-            <div style={{
-              maxWidth: "82%",
-              background: m.role === "user" ? COLORS.accent : COLORS.surface,
-              color: m.role === "user" ? "#000" : COLORS.text,
-              border: m.role === "assistant" ? `1px solid ${COLORS.border}` : "none",
-              borderRadius: m.role === "user" ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
-              padding: "10px 14px",
-              fontSize: "13px",
-              lineHeight: "1.5",
-              fontFamily: "system-ui, sans-serif",
-            }}>
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "12px 12px 12px 2px", padding: "10px 14px" }}>
-              <div style={{ display: "flex", gap: "4px" }}>
-                {[0, 1, 2].map((i) => (
-                  <div key={i} style={{ width: "6px", height: "6px", borderRadius: "50%", background: COLORS.accent, animation: `pulse 1s ${i * 0.2}s infinite` }} />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Quick Prompts */}
-      <div style={{ padding: "8px 20px", display: "flex", gap: "6px", overflowX: "auto" }}>
-        {quickPrompts.map((q) => (
-          <button key={q} onClick={() => setInput(q)} style={{ ...styles.tag(), cursor: "pointer", background: "transparent", border: `1px solid ${COLORS.border}`, whiteSpace: "nowrap", fontFamily: "inherit", color: COLORS.textDim }}>
-            {q}
-          </button>
-        ))}
-      </div>
-
-      {/* Input */}
-      <div style={{ padding: "8px 20px 12px", borderTop: `1px solid ${COLORS.border}`, display: "flex", gap: "8px" }}>
-        <input
-          style={{ ...styles.input, flex: 1, borderRadius: "20px", padding: "10px 16px" }}
-          placeholder="Ask your coach..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-        />
-        <button onClick={send} disabled={loading} style={{ ...styles.btn("primary"), borderRadius: "50%", width: "42px", height: "42px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: loading ? 0.5 : 1 }}>
-          <Icon name="send" size={14} color="#000" />
-        </button>
-      </div>
-
-      <style>{`@keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }`}</style>
     </div>
   );
 }
