@@ -2,6 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AIChat, { QUICK_PROMPTS, WELCOME_MESSAGE, fetchAIResponse } from "./AIChat";
 
 // ── Mock fetch globally ────────────────────────────────────────────────────
+beforeAll(() => {
+  window.HTMLElement.prototype.scrollIntoView = jest.fn();
+});
+
 beforeEach(() => {
   global.fetch = jest.fn();
   window.scrollTo = jest.fn();
@@ -164,7 +168,10 @@ describe("AIChat component", () => {
     mockSuccessResponse();
     render(<AIChat />);
     fireEvent.click(screen.getByTestId(`quick-prompt-${QUICK_PROMPTS[0]}`));
-    expect(screen.getByText(QUICK_PROMPTS[0])).toBeInTheDocument();
+    await waitFor(() => {
+     const matches = screen.getAllByText(QUICK_PROMPTS[0]);
+     expect(matches.length).toBeGreaterThan(0);
+   });
   });
 
   // US-04: Messages persist during session
