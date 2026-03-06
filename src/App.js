@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import LogWorkout from "./components/LogWorkout/LogWorkout";
 import History from "./components/History/History";
+import Progress from "./components/Progress/Progress";
 
 const COLORS = {
   bg: "#0a0a0a",
@@ -287,66 +288,6 @@ function Dashboard({ onStartWorkout }) {
   );
 }
 
-// ── PROGRESS ─────────────────────────────────────────────────────────────────
-function Progress() {
-  const volumeData = [
-    { week: "W1", vol: 8200 }, { week: "W2", vol: 9100 }, { week: "W3", vol: 7800 },
-    { week: "W4", vol: 10200 }, { week: "W5", vol: 11500 }, { week: "W6", vol: 10800 },
-  ];
-  const maxVol = Math.max(...volumeData.map((d) => d.vol));
-
-  return (
-    <div style={styles.page}>
-      <span style={styles.label}>Performance</span>
-      <div style={styles.accentBar} />
-
-      {/* Volume Chart */}
-      <span style={styles.label}>Weekly Volume (lbs)</span>
-      <div style={{ ...styles.card, marginBottom: "20px" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "80px" }}>
-          {volumeData.map((d) => (
-            <div key={d.week} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-              <div style={{ width: "100%", background: COLORS.accent, borderRadius: "2px 2px 0 0", height: `${(d.vol / maxVol) * 70}px`, opacity: d.week === "W6" ? 1 : 0.4, transition: "height 0.3s" }} />
-              <div style={{ fontSize: "8px", color: COLORS.textMuted }}>{d.week}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: "10px", fontSize: "11px", color: COLORS.green }}>↑ 40% volume increase over 6 weeks</div>
-      </div>
-
-      {/* PRs */}
-      <span style={styles.label}>Personal Records</span>
-      {PRs.map((pr) => (
-        <div key={pr.exercise} style={{ ...styles.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div style={{ fontWeight: "700", fontSize: "14px" }}>{pr.exercise}</div>
-            <div style={{ fontSize: "10px", color: COLORS.green, marginTop: "2px" }}>↑ {pr.trend}</div>
-            <div style={{ fontSize: "9px", color: COLORS.textMuted, marginTop: "2px" }}>{pr.date}</div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: "28px", fontWeight: "700", color: COLORS.accent, lineHeight: 1 }}>{pr.weight}</div>
-            <div style={{ fontSize: "9px", color: COLORS.textMuted }}>LBS</div>
-          </div>
-        </div>
-      ))}
-
-      {/* Muscle Balance */}
-      <span style={styles.label}>Muscle Focus (last 30 days)</span>
-      <div style={styles.card}>
-        {[["Chest", 85], ["Back", 90], ["Legs", 70], ["Shoulders", 60], ["Arms", 55]].map(([m, pct]) => (
-          <div key={m} style={{ marginBottom: "10px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "4px" }}>
-              <span>{m}</span><span style={{ color: COLORS.accent }}>{pct}%</span>
-            </div>
-            <div style={{ height: "4px", background: COLORS.surfaceAlt, borderRadius: "2px" }}>
-              <div style={{ height: "100%", width: `${pct}%`, background: COLORS.accent, borderRadius: "2px", opacity: 0.8 }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ── AI CHAT ──────────────────────────────────────────────────────────────────
 function AIChat() {
